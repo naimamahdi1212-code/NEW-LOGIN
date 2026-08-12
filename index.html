@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Dev 101 — What is Web Development?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="browser">
+    <div class="browser__bar">
+      <div class="browser__dots"><span></span><span></span><span></span></div>
+      <div class="browser__url"><span class="lock">&#128274;</span>yoursite.dev/home</div>
+    </div>
+
+    <div class="browser__body">
+      <div class="topnav">
+        <div class="topnav__links">
+          <a href="index.html" class="active">Home</a>
+          <a href="about.html">About</a>
+        </div>
+        <span class="user-pill" id="user-pill">&hellip;</span>
+      </div>
+
+      <p class="eyebrow">Web Dev 101</p>
+      <h1>What is web development?</h1>
+      <p class="lead">
+        Web development is the work of building the things you use inside a browser —
+        every site you've ever visited, from a search engine to your bank, started as
+        someone writing and connecting code.
+      </p>
+
+      <p>
+        At its core, it's the practice of turning an idea into a page that loads over
+        the internet: something a browser can request, receive, and display. That
+        page might be a single static screen, or it might talk to a database, check
+        who's logged in, and change every time you load it — like this one does.
+      </p>
+
+      <h2>Two halves of the same site</h2>
+      <div class="grid-2">
+        <div class="info-block">
+          <h3>What you see</h3>
+          <p>The layout, text, buttons, and interactions rendered in your browser.</p>
+        </div>
+        <div class="info-block">
+          <h3>What you don't</h3>
+          <p>The server logic, database, and auth that decide what you're allowed to see.</p>
+        </div>
+      </div>
+
+      <p>
+        This site is a small example of that split — a login page, a database of
+        sessions behind the scenes, and pages like this one that only render once
+        the backend confirms you're signed in.
+      </p>
+
+      <hr class="divider" />
+      <p style="margin-bottom: 0;">
+        Want more detail on how the two halves actually work together?
+        <a href="about.html" style="color: var(--accent);">Head to the About page &rarr;</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0"></script>
+  <script src="js/appwrite-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (async () => {
+      const user = await requireAuth();
+      if (user) {
+        document.getElementById("user-pill").textContent = user.email;
+      }
+    })();
+  </script>
+</body>
+</html>

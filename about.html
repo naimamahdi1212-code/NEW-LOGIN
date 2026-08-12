@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Web Dev 101</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="browser">
+    <div class="browser__bar">
+      <div class="browser__dots"><span></span><span></span><span></span></div>
+      <div class="browser__url"><span class="lock">&#128274;</span>yoursite.dev/about</div>
+    </div>
+
+    <div class="browser__body">
+      <div class="topnav">
+        <div class="topnav__links">
+          <a href="index.html">Home</a>
+          <a href="about.html" class="active">About</a>
+        </div>
+        <span class="user-pill" id="user-pill">&hellip;</span>
+      </div>
+
+      <p class="eyebrow">Web Dev 101</p>
+      <h1>Frontend, backend, and the tools between</h1>
+      <p class="lead">
+        Every site splits into two jobs: what runs in the visitor's browser, and
+        what runs on a server they never see directly.
+      </p>
+
+      <h2>Frontend</h2>
+      <p>
+        The frontend is everything rendered client-side — the HTML that structures
+        a page, the CSS that styles it, and the JavaScript that makes it interactive.
+        The login form on this site is frontend work: it's just a page waiting for
+        input, with no idea yet whether the email you type is valid.
+      </p>
+      <p>
+        Common frontend tools: <code>HTML</code>, <code>CSS</code>, <code>JavaScript</code>,
+        and frameworks like <code>React</code> or <code>Vue</code> for larger apps.
+      </p>
+
+      <h2>Backend</h2>
+      <p>
+        The backend is the part that runs somewhere else — a server that stores
+        data, checks credentials, and decides what to send back. On this site,
+        that's Appwrite: it holds accounts, issues the magic link in your email,
+        and confirms whether a session is valid before this page is allowed to load.
+      </p>
+      <p>
+        Common backend tools: databases like <code>PostgreSQL</code> or
+        <code>MongoDB</code>, backend-as-a-service platforms like
+        <code>Appwrite</code> or <code>Supabase</code>, and server languages
+        like <code>Node.js</code>, <code>Python</code>, or <code>PHP</code>.
+      </p>
+
+      <h2>How they meet</h2>
+      <p>
+        The two sides talk over the network. Your browser sends a request —
+        "log this email in," "show me the homepage" — and the backend answers
+        with data or a redirect. The login flow on this site is a small, complete
+        example: frontend collects an email, backend verifies a click on a magic
+        link, and every protected page checks with the backend before it renders.
+      </p>
+
+      <hr class="divider" />
+      <button class="secondary" id="logout-btn" style="max-width: 200px;">Log out</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0"></script>
+  <script src="js/appwrite-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (async () => {
+      const user = await requireAuth();
+      if (user) {
+        document.getElementById("user-pill").textContent = user.email;
+      }
+    })();
+
+    document.getElementById("logout-btn").addEventListener("click", logout);
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — Web Dev 101</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="browser">
+    <div class="browser__bar">
+      <div class="browser__dots"><span></span><span></span><span></span></div>
+      <div class="browser__url"><span class="lock">&#128274;</span>yoursite.dev/login</div>
+    </div>
+
+    <div class="browser__body">
+      <p class="eyebrow">Web Dev 101</p>
+      <h1>Sign in to continue</h1>
+      <p class="lead">No password needed — we'll email you a one-time link.</p>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="email">Enter your email to sign in</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <button type="submit" id="submit-btn">Send login link</button>
+      </form>
+
+      <div class="status status--pending" id="status-pending">
+        <span class="spinner"></span>
+        <span>Sending your login link&hellip;</span>
+      </div>
+
+      <div class="status status--success" id="status-success">
+        <span>&#9993;</span>
+        <span>Check your email for a login link. Don't see it? Check spam, then come back and try again.</span>
+      </div>
+
+      <div class="status status--error" id="status-error">
+        <span>&#9888;</span>
+        <span id="error-text">Something went wrong. Please try again.</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0"></script>
+  <script src="js/appwrite-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById("login-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const pending = document.getElementById("status-pending");
+    const success = document.getElementById("status-success");
+    const error = document.getElementById("status-error");
+    const errorText = document.getElementById("error-text");
+
+    function hideStatuses() {
+      [pending, success, error].forEach((el) => el.classList.remove("is-visible"));
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideStatuses();
+      const email = document.getElementById("email").value.trim();
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      pending.classList.add("is-visible");
+
+      try {
+        await sendMagicLink(email);
+        hideStatuses();
+        success.classList.add("is-visible");
+        form.reset();
+      } catch (err) {
+        hideStatuses();
+        errorText.textContent = err.message || "Something went wrong. Please try again.";
+        error.classList.add("is-visible");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Already logged in? Skip straight to the homepage.
+    redirectIfLoggedIn("index.html");
+  </script>
+</body>
+</html>
