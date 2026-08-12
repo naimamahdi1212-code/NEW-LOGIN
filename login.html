@@ -20,24 +20,32 @@
     <div class="browser__body">
       <p class="eyebrow">Web Dev 101</p>
       <h1>Sign in to continue</h1>
-      <p class="lead">No password needed — we'll email you a one-time link.</p>
+      <p class="lead">No password needed — we'll email you a one-time code.</p>
 
       <form id="login-form" novalidate>
         <div class="field">
           <label for="email">Enter your email to sign in</label>
           <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
         </div>
-        <button type="submit" id="submit-btn">Send login link</button>
+        <button type="submit" id="submit-btn">Send login code</button>
+      </form>
+
+      <form id="otp-form" novalidate style="display:none;">
+        <div class="field">
+          <label for="otp">Enter the 6-digit code we emailed you</label>
+          <input type="text" id="otp" name="otp" placeholder="123456" inputmode="numeric" pattern="[0-9]*" maxlength="6" required autocomplete="one-time-code" />
+        </div>
+        <button type="submit" id="otp-submit-btn">Verify & sign in</button>
       </form>
 
       <div class="status status--pending" id="status-pending">
         <span class="spinner"></span>
-        <span>Sending your login link&hellip;</span>
+        <span id="pending-text">Sending your login code&hellip;</span>
       </div>
 
       <div class="status status--success" id="status-success">
         <span>&#9993;</span>
-        <span>Check your email for a login link. Don't see it? Check spam, then come back and try again.</span>
+        <span>Check your email for a 6-digit code. Don't see it? Check spam.</span>
       </div>
 
       <div class="status status--error" id="status-error">
@@ -52,11 +60,16 @@
   <script src="js/auth.js"></script>
   <script>
     const form = document.getElementById("login-form");
+    const otpForm = document.getElementById("otp-form");
     const submitBtn = document.getElementById("submit-btn");
+    const otpSubmitBtn = document.getElementById("otp-submit-btn");
     const pending = document.getElementById("status-pending");
+    const pendingText = document.getElementById("pending-text");
     const success = document.getElementById("status-success");
     const error = document.getElementById("status-error");
     const errorText = document.getElementById("error-text");
+
+    let pendingUserId = null;
 
     function hideStatuses() {
       [pending, success, error].forEach((el) => el.classList.remove("is-visible"));
@@ -69,19 +82,44 @@
       if (!email) return;
 
       submitBtn.disabled = true;
+      pendingText.textContent = "Sending your login code…";
       pending.classList.add("is-visible");
 
       try {
-        await sendMagicLink(email);
+        const token = await sendEmailOtp(email);
+        pendingUserId = token.userId;
         hideStatuses();
         success.classList.add("is-visible");
-        form.reset();
+        form.style.display = "none";
+        otpForm.style.display = "block";
       } catch (err) {
         hideStatuses();
         errorText.textContent = err.message || "Something went wrong. Please try again.";
         error.classList.add("is-visible");
       } finally {
         submitBtn.disabled = false;
+      }
+    });
+
+    otpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideStatuses();
+      const otp = document.getElementById("otp").value.trim();
+      if (!otp || !pendingUserId) return;
+
+      otpSubmitBtn.disabled = true;
+      pendingText.textContent = "Verifying your code…";
+      pending.classList.add("is-visible");
+
+      try {
+        await completeEmailOtpLogin(pendingUserId, otp);
+        window.location.href = "index.html";
+      } catch (err) {
+        hideStatuses();
+        errorText.textContent = err.message || "That code looks invalid or expired. Please try again.";
+        error.classList.add("is-visible");
+      } finally {
+        otpSubmitBtn.disabled = false;
       }
     });
 
