@@ -13,20 +13,21 @@ const client = new Client()
 const account = new Account(client);
 
 /**
- * Sends a magic login link to the given email.
- * The user will be redirected to verify.html after clicking it.
+ * Sends a 6-digit OTP code to the given email.
+ * Returns the Appwrite Token object — its `userId` is needed
+ * later to complete the session, so callers must hang onto it
+ * (e.g. sessionStorage) until the code is submitted.
  */
-async function sendMagicLink(email) {
-  const redirectUrl = new URL("verify.html", window.location.href).toString();
-  return account.createMagicURLToken(ID.unique(), email, redirectUrl);
+async function sendEmailOtp(email) {
+  return account.createEmailToken(ID.unique(), email);
 }
 
 /**
- * Completes login using the userId + secret Appwrite appends
- * to the redirect URL after the user clicks the magic link.
+ * Completes login using the userId (from the createEmailToken
+ * response) and the 6-digit code the user typed in.
  */
-async function completeMagicLinkLogin(userId, secret) {
-  return account.createSession(userId, secret);
+async function completeEmailOtpLogin(userId, otp) {
+  return account.createSession(userId, otp);
 }
 
 /**
